@@ -11,12 +11,16 @@ import re
 SHEET_URL = "https://docs.google.com/spreadsheets/d/1wLybEwlypYTJQZSQqKfrPDNlX1Uz_Gue6aGKB2dOXR8/edit#gid=0"
 WS_RULES = "rules"
 WS_DIAG = "diag_groups"
-CREDENTIALS_FILE = "data-base-474608-1d944d3e6a61.json"
+import json
+
+# Membaca kredensial dari Streamlit Secrets (bukan file lokal)
+CREDENTIALS_JSON = st.secrets["GOOGLE_CREDENTIALS"]
+creds_dict = json.loads(CREDENTIALS_JSON)
 
 def init_sheets():
     try:
         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        creds = Credentials.from_service_account_file(CREDENTIALS_FILE, scopes=scope)
+        creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
         client = gspread.authorize(creds)
         sh = client.open_by_url(SHEET_URL)
 
