@@ -420,6 +420,29 @@ elif menu == "Hasil Verifikasi":
         df = apply_fragmentasi(df)
 
         df_verif = df[df["NOTE"].astype(bool)].copy()
+        
+    # --- Mapping PTD dan DISCHARGE_STATUS ---
+    if not df_verif.empty:
+        # Ubah PTD jadi teks
+        df_verif["PTD"] = df_verif["PTD"].replace({
+            1: "Ranap",
+            2: "Rajal",
+            "1": "Ranap",
+            "2": "Rajal"
+        })
+
+        # Tambah kolom DISCHARGE_STATUS (mapping dari angka ke teks)
+        if "DISCHARGE_STATUS" in df_verif.columns:
+            df_verif["DISCHARGE_STATUS"] = df_verif["DISCHARGE_STATUS"].replace({
+                1: "Atas Persetujuan Dr.",
+                2: "Dirujuk",
+                3: "Atas Permintaan Sendiri",
+                4: "Meninggal",
+                "1": "Atas Persetujuan Dr.",
+                "2": "Dirujuk",
+                "3": "Atas Permintaan Sendiri",
+                "4": "Meninggal"
+            })
 
         if df_verif.empty:
             st.info("Tidak ada hasil verifikasi.")
@@ -431,7 +454,31 @@ elif menu == "Hasil Verifikasi":
                 df_verif = df_verif[mask]
 
             tampil = ["NOTE", "KELAS_RAWAT", "PTD", "ADMISSION_DATE", "DISCHARGE_DATE",
-                      "DIAGLIST", "PROCLIST", "NAMA_PASIEN", "MRN", "SEP"]
+                      "DIAGLIST", "PROCLIST", "NAMA_PASIEN", "MRN", "SEP", "DISCHARGE_STATUS"]
             tampil = [c for c in tampil if c in df_verif.columns]
             st.dataframe(df_verif[tampil], use_container_width=True)
+                # --- Tombol download CSV & Excel ---
+        import io
+
+        csv_data = df_verif.to_csv(index=False).encode("utf-8")
+        st.download_button(
+            label="📥 Download CSV",
+            data=csv_data,
+            file_name="hasil_verifikasi.csv",
+            mime="text/csv"
+        )
+
+        # Untuk Excel
+        import pandas as pd
+        from io import BytesIO
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+            df_verif.to_excel(writer, index=False, sheet_name="Hasil Verifikasi")
+        st.download_button(
+            label="📊 Download Excel",
+            data=output.getvalue(),
+            file_name="hasil_verifikasi.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+    
     st.caption("© 2025-Iqbal Hardinansyah, AMd.Kes")
