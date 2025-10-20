@@ -114,15 +114,39 @@ def re_split_vals(s):
     return [s]
 
 def apply_manual_rules(df, rules):
-    for rule in rules:
-        kol, isi, pesan = rule.get("Kolom", ""), rule.get("Isi", ""), rule.get("Pesan", "")
-        if not kol or kol not in df.columns: continue
-        vals = [v.strip() for v in re_split_vals(isi)]
-        mask = pd.Series(False, index=df.index)
-        for v in vals:
-            mask |= df[kol].astype(str).str.contains(v, case=False, na=False)
-        add_note(df, mask, pesan)
+    import pandas as pd
+
+    # Jika rules masih berbentuk list, ubah jadi DataFrame
+    if isinstance(rules, list):
+        if len(rules) > 0 and isinstance(rules[0], dict):
+            rules = pd.DataFrame(rules)
+        else:
+            return df  # kalau kosong, langsung kembalikan df
+
+    for _, rule in rules.iterrows():
+        kol = rule.get("Kolom", "")
+        isi = str(rule.get("Isi", "")).strip()
+        pesan = rule.get("Pesan", "")
+
+        if not kol or kol not in df.columns:
+            continue
+
+        # Jika kolom DIAGLIST dan isi berisi banyak kode (misal: J18.9;J44.0)
+        if kol == "DIAGLIST" and ";" in isi:
+            target_kode = [i.strip() for i in isi.split(";") if i.strip()]
+            for i, row in df.iterrows():
+                diaglist = str(row["DIAGLIST"]).split(";")
+                # Semua kode di rule harus muncul di DIAGLIST pasien
+                if all(kode in diaglist for kode in target_kode):
+                    df.at[i, "NOTE"] += f"| {pesan}"
+
+        # Untuk rule biasa (bukan gabungan DIAGLIST)
+        else:
+            mask = df[kol].astype(str).str.contains(isi, case=False, na=False)
+            df.loc[mask, "NOTE"] += f"| {pesan}"
+
     return df
+
 
 def apply_los(df):
     if "PTD" in df.columns and "LOS" in df.columns:
