@@ -237,7 +237,7 @@ with st.sidebar:
     st.title("E-Klaim Verif")
     menu = st.radio("Navigasi", ["Dashboard", "Upload File", "Eklaim Data", "Rules", "Hasil Verifikasi"])
     st.markdown("---")
-    st.caption("© 2025-Iqbal Hardinansyah, AMd.Kes")
+    st.caption("© 2026-Iqbal Hardinansyah, AMd.Kes")
 
 # ====================================
 # MENU UPLOAD FILE
@@ -250,7 +250,7 @@ if menu == "Upload File":
         st.session_state.data = df
         st.success(f"File berhasil dimuat: {len(df)} baris.")
         st.dataframe(df.head())
-    st.caption("© 2025-Iqbal Hardinansyah, AMd.Kes")
+    st.caption("© 2026-Iqbal Hardinansyah, AMd.Kes")
 
 # ====================================
 # MENU EKLAIM DATA
@@ -268,7 +268,7 @@ elif menu == "Eklaim Data":
         if "TOTAL_TARIF" in df.columns and "TARIF_RS" in df.columns:
             df["Selisih"] = pd.to_numeric(df["TOTAL_TARIF"], errors="coerce") - pd.to_numeric(df["TARIF_RS"], errors="coerce")
         st.dataframe(df, use_container_width=True)
-    st.caption("© 2025-Iqbal Hardinansyah, AMd.Kes")
+    st.caption("© 2026-Iqbal Hardinansyah, AMd.Kes")
 
 # ====================================
 # MENU RULES
@@ -344,7 +344,7 @@ elif menu == "Rules":
     else:
         st.info("Belum ada grup diagnosa tersimpan.")
 
-    st.caption("© 2025-Iqbal Hardinansyah, AMd.Kes")
+    st.caption("© 2026-Iqbal Hardinansyah, AMd.Kes")
 
 
 # ====================================
@@ -399,7 +399,7 @@ elif menu == "Dashboard":
             proc_counts.columns = ["Tindakan", "Jumlah"]
             st.dataframe(proc_counts)
 
-    st.caption("© 2025-Iqbal Hardinansyah, AMd.Kes")
+    st.caption("© 2026-Iqbal Hardinansyah, AMd.Kes")
 
 # ====================================
 # MENU HASIL VERIFIKASI
