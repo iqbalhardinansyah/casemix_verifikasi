@@ -62,14 +62,33 @@ def detect_sep(line: str):
 
 def parse_txt(uploaded_file):
     content = uploaded_file.read()
+
     try:
         text = content.decode("utf-8")
     except:
         text = content.decode("latin1", errors="ignore")
 
-    sep = detect_sep(text.splitlines()[0])
-    df = pd.read_csv(StringIO(text), sep=sep, engine="python", dtype=str, keep_default_na=False)
-    df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
+    lines = text.splitlines()
+
+    if not lines:
+        return pd.DataFrame()
+
+    # paksa delimiter TAB (karena file kamu jelas pakai tab)
+    df = pd.read_csv(
+        StringIO(text),
+        sep="\t",
+        engine="python",
+        dtype=str,
+        keep_default_na=False,
+        on_bad_lines="skip"  # 🔥 penting: skip baris rusak
+    )
+
+    # bersihkan data dengan aman
+    df = df.fillna("")
+
+    for col in df.columns:
+        df[col] = df[col].astype(str).str.strip()
+
     return df
 
 # ====================================
