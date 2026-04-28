@@ -281,6 +281,7 @@ with st.sidebar:
         if st.button("🚪 Logout"):
             st.session_state.login = False
         st.rerun()
+    
     st.title("E-Klaim Verif")
     menu = st.radio("Navigasi", ["Dashboard", "Upload File", "Eklaim Data", "Rules", "Hasil Verifikasi"])
     st.markdown("---")
