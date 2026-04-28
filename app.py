@@ -6,6 +6,30 @@ from google.oauth2.service_account import Credentials
 import re
 
 # ====================================
+# LOGIN SEDERHANA
+# ====================================
+def check_login():
+    if "login" not in st.session_state:
+        st.session_state.login = False
+
+    if not st.session_state.login:
+        st.title("🔐 Login Aplikasi")
+
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
+
+        if st.button("Login"):
+            # Ganti sesuai kebutuhan
+            if username == "admin" and password == "12345":
+                st.session_state.login = True
+                st.success("Login berhasil")
+                st.rerun()
+            else:
+                st.error("Username atau password salah")
+
+        st.stop()  # ⛔ menghentikan app sebelum login
+
+# ====================================
 # KONFIGURASI GOOGLE SHEETS
 # ====================================
 SHEET_URL = "https://docs.google.com/spreadsheets/d/1wLybEwlypYTJQZSQqKfrPDNlX1Uz_Gue6aGKB2dOXR8/edit#gid=0"
@@ -47,6 +71,7 @@ sh, ws_rules, ws_diag = init_sheets()
 # KONFIGURASI STREAMLIT
 # ====================================
 st.set_page_config(page_title="E-Klaim Verif", layout="wide", initial_sidebar_state="expanded")
+check_login()
 
 if "data" not in st.session_state:
     st.session_state.data = None
@@ -253,6 +278,9 @@ def apply_fragmentasi(df):
 # SIDEBAR
 # ====================================
 with st.sidebar:
+        if st.button("🚪 Logout"):
+        st.session_state.login = False
+        st.rerun()
     st.title("E-Klaim Verif")
     menu = st.radio("Navigasi", ["Dashboard", "Upload File", "Eklaim Data", "Rules", "Hasil Verifikasi"])
     st.markdown("---")
